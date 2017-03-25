@@ -26,6 +26,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#include <linux/lcd_notify.h>
 
 #include "hisi_fb.h"
 #include <linux/huawei/hisi_adc.h>
@@ -657,6 +658,7 @@ static int hw_lcd_on(struct platform_device* pdev)
 	if (pinfo->lcd_init_step == LCD_INIT_POWER_ON) {
 		g_debug_enable = BACKLIGHT_PRINT_TIMES;
 		LOG_JANK_D(JLID_KERNEL_LCD_POWER_ON, "%s", "JL_KERNEL_LCD_POWER_ON");
+		lcd_notifier_call_chain(LCD_EVENT_ON_START, NULL);
 #if HW_LCD_DEBUG
 	if (is_enable_vsp_vsn_debug()){
 		lcd_debug_set_vsp_vsn(hw_lcd_scharger_vcc_set_cmds, ARRAY_SIZE(hw_lcd_scharger_vcc_set_cmds));
@@ -762,6 +764,7 @@ static int hw_lcd_on(struct platform_device* pdev)
 
 	// backlight on
 	hisi_lcd_backlight_on(pdev);
+	lcd_notifier_call_chain(LCD_EVENT_ON_END, NULL);
 
 	HISI_FB_INFO("fb%d, -!\n", hisifd->index);
 
@@ -802,6 +805,7 @@ static int hw_lcd_off(struct platform_device* pdev)
 
 	if (pinfo->lcd_uninit_step == LCD_UNINIT_MIPI_HS_SEND_SEQUENCE) {
 		LOG_JANK_D(JLID_KERNEL_LCD_POWER_OFF, "%s", "JL_KERNEL_LCD_POWER_OFF");
+		lcd_notifier_call_chain(LCD_EVENT_OFF_START, NULL);
 
 		// backlight off
 		hisi_lcd_backlight_off(pdev);
@@ -883,6 +887,7 @@ static int hw_lcd_off(struct platform_device* pdev)
 	}
 
 	HISI_FB_INFO("fb%d, -!\n", hisifd->index);
+	lcd_notifier_call_chain(LCD_EVENT_OFF_END, NULL);
 
 	return 0;
 }
