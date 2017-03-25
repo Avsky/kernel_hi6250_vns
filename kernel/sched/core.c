@@ -3161,11 +3161,11 @@ need_resched:
 		rq->nr_switches++;
 		rq->curr = next;
 		++*switch_count;
-
+/*
 #ifdef CONFIG_HUAWEI_MSG_POLICY
 		update_msg_stat(cpu, prev, next);
 #endif
-
+*/
 		context_switch(rq, prev, next); /* unlocks the rq */
 		/*
 		 * The context switch have flipped the stack from under us
@@ -5386,6 +5386,18 @@ static void set_rq_offline(struct rq *rq)
 	}
 }
 
+static inline void account_reset_rq(struct rq *rq)
+{
+#ifdef CONFIG_IRQ_TIME_ACCOUNTING
+	rq->prev_irq_time = 0;
+#endif
+#ifdef CONFIG_PARAVIRT
+	rq->prev_steal_time = 0;
+#endif
+#ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
+	rq->prev_steal_time_rq = 0;
+#endif
+}
 
 static int __cpuinit
 migration_call(struct notifier_block *nfb, unsigned long action, void *hcpu)

@@ -34,12 +34,6 @@
  */
 unsigned int pipe_max_size = 1048576;
 
-/* Maximum allocatable pages per user. Hard limit is unset by default, soft
- * matches default values.
- */
-unsigned long pipe_user_pages_hard;
-unsigned long pipe_user_pages_soft = PIPE_DEF_BUFFERS * INR_OPEN_CUR;
-
 /*
  * Minimum pipe size, as required by POSIX
  */
