@@ -34,6 +34,12 @@
  */
 unsigned int pipe_max_size = 1048576;
 
+/* Maximum allocatable pages per user. Hard limit is unset by default, soft
+ * matches default values.
+ */
+unsigned long pipe_user_pages_hard;
+unsigned long pipe_user_pages_soft = PIPE_DEF_BUFFERS * INR_OPEN_CUR;
+
 /*
  * Minimum pipe size, as required by POSIX
  */
@@ -1315,6 +1321,11 @@ long pipe_fcntl(struct file *file, unsigned int cmd, unsigned long arg)
 			goto out;
 
 		if (!capable(CAP_SYS_RESOURCE) && size > pipe_max_size) {
+			ret = -EPERM;
+			goto out;
+		} else if ((too_many_pipe_buffers_hard(pipe->user) ||
+			    too_many_pipe_buffers_soft(pipe->user)) &&
+		           !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN)) {
 			ret = -EPERM;
 			goto out;
 		} else if ((too_many_pipe_buffers_hard(pipe->user) ||

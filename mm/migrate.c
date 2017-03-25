@@ -308,7 +308,7 @@ static inline bool buffer_migrate_lock_buffers(struct buffer_head *head,
  * 2 for pages with a mapping
  * 3 for pages with a mapping and PagePrivate/PagePrivate2 set.
  */
-static int migrate_page_move_mapping(struct address_space *mapping,
+int migrate_page_move_mapping(struct address_space *mapping,
 		struct page *newpage, struct page *page,
 		struct buffer_head *head, enum migrate_mode mode)
 {
@@ -412,6 +412,7 @@ static int migrate_page_move_mapping(struct address_space *mapping,
 
 	return MIGRATEPAGE_SUCCESS;
 }
+EXPORT_SYMBOL(migrate_page_move_mapping);
 
 /*
  * The expected number of remaining references is the same as that
@@ -428,6 +429,9 @@ int migrate_huge_page_move_mapping(struct address_space *mapping,
 			return -EAGAIN;
 		return MIGRATEPAGE_SUCCESS;
 	}
+
+	oldzone = page_zone(page);
+	newzone = page_zone(newpage);
 
 	spin_lock_irq(&mapping->tree_lock);
 
@@ -447,6 +451,13 @@ int migrate_huge_page_move_mapping(struct address_space *mapping,
 	}
 
 	get_page(newpage);
+
+	/* Move dirty while page refs frozen and newpage not yet exposed */
+	dirty = PageDirty(page);
+	if (dirty) {
+		ClearPageDirty(page);
+		SetPageDirty(newpage);
+	}
 
 	radix_tree_replace_slot(pslot, newpage);
 
@@ -496,6 +507,9 @@ void migrate_page_copy(struct page *newpage, struct page *page)
 	ClearPagePrivate(page);
 	set_page_private(page, 0);
 
+	spin_unlock(&mapping->tree_lock);
+	/* Leave irq disabled to prevent preemption while updating stats */
+
 	/*
 	 * If any waiters have accumulated on the new page then
 	 * wake them up.
@@ -503,6 +517,7 @@ void migrate_page_copy(struct page *newpage, struct page *page)
 	if (PageWriteback(newpage))
 		end_page_writeback(newpage);
 }
+EXPORT_SYMBOL(migrate_page_copy);
 
 /************************************************************
  *                    Migration functions

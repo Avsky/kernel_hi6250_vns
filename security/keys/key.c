@@ -498,7 +498,7 @@ int key_instantiate_and_link(struct key *key,
 	ret = __key_instantiate_and_link(key, &prep, keyring, authkey,
 					 &prealloc);
 
-	if (keyring)
+	if (keyring && link_ret == 0)
 		__key_link_end(keyring, key->type, prealloc);
 
 error_free_preparse:

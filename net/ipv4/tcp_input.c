@@ -3268,6 +3268,7 @@ static void tcp_send_challenge_ack(struct sock *sk)
 
 	if (now != challenge_timestamp) {
 		u32 half = (sysctl_tcp_challenge_ack_limit + 1) >> 1;
+		
 		challenge_timestamp = now;
 		ACCESS_ONCE(challenge_count) = half +
 			reciprocal_divide(prandom_u32(),
@@ -5613,6 +5614,7 @@ discard:
 		}
 
 		tp->rcv_nxt = TCP_SKB_CB(skb)->seq + 1;
+		tp->copied_seq = tp->rcv_nxt;
 		tp->rcv_wup = TCP_SKB_CB(skb)->seq + 1;
 
 		/* RFC1323: The window in SYN & SYN/ACK segments is
