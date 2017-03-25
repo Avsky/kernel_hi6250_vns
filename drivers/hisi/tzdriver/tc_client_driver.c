@@ -1427,10 +1427,10 @@ static long tc_client_ioctl(struct file *file, unsigned cmd,
 	case TC_NS_CLIENT_IOCTL_SEND_CMD_REQ:
 		ret = tc_client_session_ioctl(file, cmd, arg);
 		break;
-       /*case TC_NS_CLIENT_IOCTL_SHRD_MEM_RELEASE:{
-	        ret = TC_NS_SharedMemoryRelease(dev_file, (void *)arg);
-	        break;
-	 }*/
+    case TC_NS_CLIENT_IOCTL_SHRD_MEM_RELEASE:{
+	    ret = TC_NS_SharedMemoryRelease(dev_file, (void *)arg);
+	    break;
+	}
 
 	case TC_NS_CLIENT_IOCTL_NEED_LOAD_APP:{
 		mutex_lock(&load_app_lock);
