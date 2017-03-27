@@ -660,12 +660,12 @@ static int hw_lcd_on(struct platform_device* pdev)
 		LOG_JANK_D(JLID_KERNEL_LCD_POWER_ON, "%s", "JL_KERNEL_LCD_POWER_ON");
 		lcd_notifier_call_chain(LCD_EVENT_ON_START, NULL);
 #if HW_LCD_DEBUG
-	if (is_enable_vsp_vsn_debug()){
-		lcd_debug_set_vsp_vsn(hw_lcd_scharger_vcc_set_cmds, ARRAY_SIZE(hw_lcd_scharger_vcc_set_cmds));
-			/*set scharger vcc*/
-		vcc_cmds_tx(NULL, hw_lcd_scharger_vcc_set_cmds, \
-					ARRAY_SIZE(hw_lcd_scharger_vcc_set_cmds));
-	}
+		if (is_enable_vsp_vsn_debug()){
+			lcd_debug_set_vsp_vsn(hw_lcd_scharger_vcc_set_cmds, ARRAY_SIZE(hw_lcd_scharger_vcc_set_cmds));
+				/*set scharger vcc*/
+			vcc_cmds_tx(NULL, hw_lcd_scharger_vcc_set_cmds, \
+						ARRAY_SIZE(hw_lcd_scharger_vcc_set_cmds));
+		}
 #endif
 		if (false == gesture_func && !g_debug_enable_lcd_sleep_in) {
 			//lcd vcc enable
@@ -758,13 +758,13 @@ static int hw_lcd_on(struct platform_device* pdev)
 				HISI_FB_ERR("ts after resume err\n");
 		}
 #endif
+		lcd_notifier_call_chain(LCD_EVENT_ON_END, NULL);
 	} else {
 		HISI_FB_ERR("failed to init lcd!\n");
 	}
 
 	// backlight on
 	hisi_lcd_backlight_on(pdev);
-	lcd_notifier_call_chain(LCD_EVENT_ON_END, NULL);
 
 	HISI_FB_INFO("fb%d, -!\n", hisifd->index);
 
@@ -881,13 +881,12 @@ static int hw_lcd_off(struct platform_device* pdev)
 			ts_thread_stop_notify();
 		}
 #endif
-
+		lcd_notifier_call_chain(LCD_EVENT_OFF_END, NULL);
 	} else {
 		HISI_FB_ERR("failed to uninit lcd!\n");
 	}
 
 	HISI_FB_INFO("fb%d, -!\n", hisifd->index);
-	lcd_notifier_call_chain(LCD_EVENT_OFF_END, NULL);
 
 	return 0;
 }
