@@ -2072,7 +2072,7 @@ static int try_merge_rmap_item(struct rmap_item *item,
 	page_add_anon_rmap(tree_page, vma, addr);
 
 	flush_cache_page(vma, addr, pte_pfn(*ptep));
-	ptep_clear_flush_(vma, addr, ptep);
+	ptep_clear_flush(vma, addr, ptep);
 	set_pte_at_notify(vma->vm_mm, addr, ptep,
 			  mk_pte(tree_page, vma->vm_page_prot));
 
