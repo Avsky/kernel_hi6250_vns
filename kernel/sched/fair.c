@@ -4243,9 +4243,6 @@ int set_hmp_boost(int enable)
 {
 	return hmp_boost_from_sysfs(enable);
 }
-#ifdef CONFIG_THUNDERPLUG_CONTROL
-EXPORT_SYMBOL_GPL(set_hmp_boost);
-#endif
 
 int set_hmp_boostpulse(int duration)
 {
